@@ -5,17 +5,45 @@ import axios from 'axios';
 import DarkModeToggle from "../DarkModeToggle";
 import LoginBackground from '../../assets/Wallpaper.webp';
 import Logo from '../../assets/triumph-log.png';
+import { useAuth } from "../../context/AuthProvider";
 
 const Login = () => {
+
+  const apiUrl = import.meta.env.VITE_API_URL;
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const apiUrl = import.meta.env.VITE_API_URL;
+  const { login } = useAuth();
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
-    // Add your login logic here, e.g., using axios to send credentials to the backend
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(`${apiUrl}/api/login/`, {
+        email,
+        password
+      });
+      console.log(response);
+      if (response.status === 200) {
+        console.log(response.data);
+        login({
+          access: response.data.access,
+          refresh: response.data.refresh,
+          user: response.data.user,
+        });
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.error(error);
+      if (error.response && error.response.data) {
+        setError(error.response.data.error);
+      } else {
+        setError("An error occurred during login.");
+      }
+    }
   };
+
 
   return (
     <div className="gradient-form bg-neutral-300 dark:bg-neutral-700">

@@ -16,30 +16,57 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
     if (password !== confirmPassword) {
         Swal.fire({
             icon: 'error',
             title: 'Oops...',
             text: 'Passwords do not match!'
-        })
+        });
         return;
     }
+
     try {
         const response = await axios.post(`${apiUrl}/api/register/`, {
-            name: fullName,
+            fullName,
             email,
             password
         });
-        console.log(response);
+
         Swal.fire({
             icon: 'success',
             title: 'Success',
             text: 'Registration successful!'
-        })
+        }).then(() => {
+            window.location.href = '/login';  // Redirect to login page
+        });
+
     } catch (error) {
-        console.error(error);
+        if (error.response && error.response.data.errors) {
+            const errors = error.response.data.errors;
+            let errorMessage = '';
+
+            for (const key in errors) {
+                if (errors.hasOwnProperty(key)) {
+                    errorMessage += `${errors[key].join(' ')}\n`;
+                }
+            }
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Registration Failed',
+                text: errorMessage
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'An unexpected error occurred',
+                text: 'Please try again later.'
+            });
+        }
     }
 };
+
 
   return (
     <div className="gradient-form bg-neutral-300 dark:bg-neutral-700">

@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
-import Logo from '../assets/Logo/AltosLogo.png';
+import Logo from '../assets/triumph-log.png';
+import { useAuth } from "../context/AuthProvider";
+
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const { authTokens, logout } = useAuth();
+
  
 
   const toggleMenu = () => {
@@ -12,7 +16,8 @@ function Navbar() {
   };
 
   const handleLogout = () => {
- 
+    logout(); 
+    navigate('/login');
   };
 
   return (
