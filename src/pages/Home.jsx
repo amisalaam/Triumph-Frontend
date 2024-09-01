@@ -6,7 +6,7 @@ function Home() {
     <div>
       <Navbar/>
       <AllTokens/>
-      Home</div>
+      </div>
   )
 }
 

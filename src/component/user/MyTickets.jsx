@@ -1,16 +1,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth } from "../../context/AuthProvider";
-import _ from 'lodash'; 
+import _ from 'lodash';
+import TokenCreatingModal from './TokenCreatingModal';
+import TokenDetailModal from './TokenDetailModal';
 
-function AllTokens() {
+function MyTikets() {
+    const { authTokens } = useAuth();
     const apiUrl = import.meta.env.VITE_API_URL;
     const [tickets, setTickets] = useState([]);
     const [status, setStatus] = useState('');
     const [priority, setPriority] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const { authTokens } = useAuth();
+    const [tokenId, setTokenId] = useState(null);
+    const [isTokenCreatingModalOpen, setIsTokenCreatingModalOpen] = useState(false);
+    const [isTokenDetailModalOpen, setIsTokenDetailModalOpen] = useState(false);
 
     // Debounced function to fetch tickets
     const fetchTickets = useCallback(
@@ -22,6 +27,7 @@ function AllTokens() {
                     params: {
                         status: status,
                         priority: priority,
+                        user: authTokens.user.id,
                     },
                     headers: {
                         Authorization: `Bearer ${authTokens.accessToken}`,
@@ -42,11 +48,34 @@ function AllTokens() {
         fetchTickets();
     }, [fetchTickets]);
 
+    const toggleTokenCreatingModal = () => {
+        setIsTokenCreatingModalOpen(!isTokenCreatingModalOpen);
+    };
+
+    const toggleTokenDetailModal = (tokenId) => {
+        setTokenId(tokenId);
+        setIsTokenDetailModalOpen(!isTokenDetailModalOpen);
+    };
+
+    const handleNewToken = (newToken) => {
+        setTickets((prevTickets) => [newToken, ...prevTickets]);
+    };
+
+    const handleTokenUpdate = (updatedToken) => {
+        setTickets((prevTickets) => prevTickets.map(ticket => 
+            ticket.id === updatedToken.id ? updatedToken : ticket
+        ));
+    };
+
+    const handleTokenDelete = (deletedTokenId) => {
+        setTickets((prevTickets) => prevTickets.filter(ticket => ticket.id !== deletedTokenId));
+    };
+
     return (
         <div className="p-4 sm:ml-64">
             <div className="md:p-10 rounded-lg mt-14">
                 <div className="relative overflow-x-auto sm:rounded-lg">
-                    <h1 className="mt-5 text-4xl font-bold">All Tickets</h1>
+                    <h1 className="mt-5 text-4xl font-bold">My Tickets</h1>
                     <div className="flex justify-between my-10">
                         <div className="flex space-x-4">
                             {/* Filters */}
@@ -71,6 +100,15 @@ function AllTokens() {
                                 <option value="high">High</option>
                             </select>
                         </div>
+
+                        <div>
+                            <button
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                onClick={toggleTokenCreatingModal}
+                            >
+                                Create Token
+                            </button>
+                        </div>
                     </div>
 
                     {loading && <p>Loading...</p>}
@@ -86,19 +124,24 @@ function AllTokens() {
                                         <TicketDescription description={ticket.description} />
                                     </div>
                                 </div>
-                                <div className="px-6 pt-4 pb-2 flex justify-between">
+                                <div className="px-4 pt-4 pb-2 flex justify-between">
                                     <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
                                         Priority: {ticket.priority}
                                     </span>
                                     <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
                                         Status: {ticket.status}
                                     </span>
+                                    <button onClick={() => toggleTokenDetailModal(ticket.id)} className="inline-block bg-red-900 rounded-full px-3 py-1 text-sm font-semibold text-white mr-2 mb-2">
+                                        Details
+                                    </button>
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
             </div>
+            {isTokenCreatingModalOpen && <TokenCreatingModal onClose={toggleTokenCreatingModal} onTokenCreate={handleNewToken} />}
+            {isTokenDetailModalOpen && <TokenDetailModal tokenId={tokenId} onClose={toggleTokenDetailModal} onTokenUpdate={handleTokenUpdate} onTokenDelete={handleTokenDelete} />}
         </div>
     );
 }
@@ -124,4 +167,4 @@ const TicketDescription = ({ description }) => {
     );
 };
 
-export default AllTokens;
+export default MyTikets;
