@@ -1,22 +1,25 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import PageNotFound from './component/PageNotFound';
+
+// Pages
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import MyTicket from './pages/MyTicket';
+import Dashboard from './pages/admin/Dashboard';
+
+// Components
+import PageNotFound from './component/PageNotFound';
 
 // Routes
 import PrivateRoute from './routes/PrivateRoutes';
 import PublicRoute from './routes/PublicRoutes';
-import Dashboard from './pages/admin/Dashboard';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="*" element={<PageNotFound />} />
-
+        {/* Public Routes */}
         <Route
           path="/login"
           element={<PublicRoute element={<Login />} restricted={true} />}
@@ -31,19 +34,17 @@ function App() {
           path="/"
           element={<PrivateRoute element={<Home />} />}
         />
-
         <Route
           path="/mytickets"
           element={<PrivateRoute element={<MyTicket />} />}
         />
-
         <Route
-        path='/admin/dashboard'
-        element={<PrivateRoute element={<Dashboard />} adminOnly={true} />}
-      />
+          path="/admin/dashboard"
+          element={<PrivateRoute element={<Dashboard />} adminOnly={true} />}
+        />
 
-
-
+        {/* Catch-all for 404 Page Not Found */}
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
     </Router>
   );
