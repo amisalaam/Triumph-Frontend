@@ -1,48 +1,72 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from 'axios';
+import Swal from "sweetalert2";
 
 import DarkModeToggle from "../DarkModeToggle";
 import LoginBackground from '../../assets/Wallpaper.webp';
 import Logo from '../../assets/triumph-log.png';
-import { useAuth } from "../../context/AuthProvider";
 
-const Login = () => {
-
-  const apiUrl = import.meta.env.VITE_API_URL;
-
+const Register = () => {
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const { login } = useAuth();
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const apiUrl = import.meta.env.VITE_API_URL;
+  
 
-
-  const handleLogin = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post(`${apiUrl}/api/login/`, {
-        email,
-        password
-      });
-      console.log(response);
-      if (response.status === 200) {
-        console.log(response.data);
-        login({
-          access: response.data.access,
-          refresh: response.data.refresh,
-          user: response.data.user,
+
+    if (password !== confirmPassword) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Passwords do not match!'
         });
-        window.location.href = "/";
-      }
-    } catch (error) {
-      console.error(error);
-      if (error.response && error.response.data) {
-        setError(error.response.data.error);
-      } else {
-        setError("An error occurred during login.");
-      }
+        return;
     }
-  };
+
+    try {
+        const response = await axios.post(`${apiUrl}/api/register/`, {
+            fullName,
+            email,
+            password
+        });
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Registration successful!'
+        }).then(() => {
+            window.location.href = '/login';  // Redirect to login page
+        });
+
+    } catch (error) {
+        if (error.response && error.response.data.errors) {
+            const errors = error.response.data.errors;
+            let errorMessage = '';
+
+            for (const key in errors) {
+                if (errors.hasOwnProperty(key)) {
+                    errorMessage += `${errors[key].join(' ')}\n`;
+                }
+            }
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Registration Failed',
+                text: errorMessage
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'An unexpected error occurred',
+                text: 'Please try again later.'
+            });
+        }
+    }
+};
 
 
   return (
@@ -59,9 +83,22 @@ const Login = () => {
                     <img className="mx-auto w-48" src={Logo} alt="logo" />
                   </div>
                   <p className="mb-4 text-center">
-                    Please login to your account
+                    Please register your account
                   </p>
-                  <form onSubmit={handleLogin}>
+                  <form onSubmit={handleRegister}>
+                    <div className="mb-4">
+                      <input
+                        type="text"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        name="fullName"
+                        autoComplete="off"
+                        required
+                        className="block w-full px-4 py-2 rounded border border-neutral-400 dark:border-neutral-600 bg-transparent focus:outline-none focus:ring focus:border-primary-500 dark:focus:border-primary-500 placeholder-neutral-500 dark:placeholder-neutral-300 text-neutral-700 dark:text-neutral-300"
+                        placeholder="Full Name"
+                      />
+                    </div>
+
                     <div className="mb-4">
                       <input
                         type="email"
@@ -88,23 +125,36 @@ const Login = () => {
                       />
                     </div>
 
+                    <div className="mb-4">
+                      <input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        name="confirmPassword"
+                        autoComplete="off"
+                        required
+                        className="block w-full px-4 py-2 rounded border border-neutral-400 dark:border-neutral-600 bg-transparent focus:outline-none focus:ring focus:border-primary-500 dark:focus:border-primary-500 placeholder-neutral-500 dark:placeholder-neutral-300 text-neutral-700 dark:text-neutral-300"
+                        placeholder="Confirm Password"
+                      />
+                    </div>
+
                     <div className="mb-6 text-center">
                       <button
                         type="submit"
                         className="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-semibold py-3 px-10 rounded-full shadow-md transition-transform transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-300"
                       >
-                        Log In
+                        Register
                       </button>
                     </div>
                   </form>
 
                   <div className="flex items-center justify-between">
-                    <p>Don't have an account?</p>
+                    <p>Already have an account?</p>
                     <Link
-                      to="/register"
+                      to="/login"
                       className="px-4 py-2 bg-transparent border border-danger text-danger-600 rounded hover:bg-danger-100 hover:text-danger-700 focus:outline-none focus:border-danger-600 focus:text-danger-600 dark:border-danger-400 dark:hover:bg-danger-100 dark:hover:text-danger-700 dark:focus:border-danger-400 dark:focus:text-danger-600"
                     >
-                      Register
+                      Login
                     </Link>
                   </div>
                 </div>
@@ -135,4 +185,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

@@ -1,8 +1,12 @@
 import React from 'react'
-
+import Navbar from '../component/user/Navbar'
+import AllTokens from '../component/user/AllTokens'
 function Home() {
   return (
-    <div>Home</div>
+    <div>
+      <Navbar/>
+      <AllTokens/>
+      </div>
   )
 }
 
