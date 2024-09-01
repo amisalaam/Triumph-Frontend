@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import { useAuth } from "../../context/AuthProvider";
 import axios from 'axios';
 
-function TokenCreatingModal({ onClose,onTokenCreate }) {
+function TicketCreatingModal({ onClose, onTicketCreate }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('low');
   const [status, setStatus] = useState('open');
   const { authTokens } = useAuth();
-
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -25,20 +24,18 @@ function TokenCreatingModal({ onClose,onTokenCreate }) {
         },
       });
       console.log(response.data);
-      onTokenCreate(response.data);
+      onTicketCreate(response.data);
       onClose();
     } catch (error) {
       console.error('Error creating ticket:', error);
     }
   };
 
-
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
       <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
         <div className="flex justify-between items-center border-b pb-3">
-          <h2 className="text-xl font-semibold text-gray-800">Create New Token</h2>
+          <h2 className="text-xl font-semibold text-gray-800">Create New Ticket</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -98,7 +95,7 @@ function TokenCreatingModal({ onClose,onTokenCreate }) {
 
           <div className="flex justify-end">
             <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-              Create Token
+              Create Ticket
             </button>
           </div>
         </form>
@@ -107,4 +104,4 @@ function TokenCreatingModal({ onClose,onTokenCreate }) {
   );
 }
 
-export default TokenCreatingModal;
+export default TicketCreatingModal;
