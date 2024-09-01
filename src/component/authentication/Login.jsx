@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
 import axios from 'axios';
 
 import DarkModeToggle from "../DarkModeToggle";
@@ -16,7 +17,14 @@ const Login = () => {
   const [error, setError] = useState("");
   const { login } = useAuth();
 
-
+  const validateForm = () => {
+    if (!email || !password) {
+      setError("Please fill in all fields.");
+      return false;
+    }
+    return true;
+  };
+  
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -37,12 +45,37 @@ const Login = () => {
     } catch (error) {
       console.error(error);
       if (error.response && error.response.data) {
-        setError(error.response.data.error);
+        const errorMessages = error.response.data;
+        // Check for specific error message format
+        if (typeof errorMessages === 'string') {
+          Swal.fire({
+            icon: 'error',
+            title: 'Login Failed',
+            text: errorMessages,
+          });
+        } else {
+          let errorMessage = '';
+          for (const key in errorMessages) {
+            if (errorMessages.hasOwnProperty(key)) {
+              errorMessage += `${errorMessages[key].join(' ')}\n`;
+            }
+          }
+          Swal.fire({
+            icon: 'error',
+            title: 'Login Failed',
+            text: errorMessage || 'An error occurred during login.',
+          });
+        }
       } else {
-        setError("An error occurred during login.");
+        Swal.fire({
+          icon: 'error',
+          title: 'An unexpected error occurred',
+          text: 'Please try again later.',
+        });
       }
     }
   };
+  
 
 
   return (
@@ -133,6 +166,6 @@ const Login = () => {
       </div>
     </div>
   );
-};
+}; 
 
 export default Login;

@@ -12,20 +12,31 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState({});
   const apiUrl = import.meta.env.VITE_API_URL;
-  
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!fullName) newErrors.fullName = "Full name is required.";
+    if (!email) {
+      newErrors.email = "Email is required.";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Email address is invalid.";
+    }
+    if (!password) newErrors.password = "Password is required.";
+    else if (password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters long.";
+    }
+    if (password !== confirmPassword) newErrors.confirmPassword = "Passwords do not match.";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Passwords do not match!'
-        });
-        return;
-    }
+    if (!validateForm()) return;
 
     try {
         const response = await axios.post(`${apiUrl}/api/register/`, {
@@ -66,8 +77,7 @@ const Register = () => {
             });
         }
     }
-};
-
+  };
 
   return (
     <div className="gradient-form bg-neutral-300 dark:bg-neutral-700">
@@ -93,10 +103,10 @@ const Register = () => {
                         onChange={(e) => setFullName(e.target.value)}
                         name="fullName"
                         autoComplete="off"
-                        required
-                        className="block w-full px-4 py-2 rounded border border-neutral-400 dark:border-neutral-600 bg-transparent focus:outline-none focus:ring focus:border-primary-500 dark:focus:border-primary-500 placeholder-neutral-500 dark:placeholder-neutral-300 text-neutral-700 dark:text-neutral-300"
+                        className={`block w-full px-4 py-2 rounded border ${errors.fullName ? 'border-red-500' : 'border-neutral-400'} dark:border-neutral-600 bg-transparent focus:outline-none focus:ring focus:border-primary-500 dark:focus:border-primary-500 placeholder-neutral-500 dark:placeholder-neutral-300 text-neutral-700 dark:text-neutral-300`}
                         placeholder="Full Name"
                       />
+                      {errors.fullName && <p className="text-red-500 text-sm">{errors.fullName}</p>}
                     </div>
 
                     <div className="mb-4">
@@ -106,10 +116,10 @@ const Register = () => {
                         onChange={(e) => setEmail(e.target.value)}
                         name="email"
                         autoComplete="off"
-                        required
-                        className="block w-full px-4 py-2 rounded border border-neutral-400 dark:border-neutral-600 bg-transparent focus:outline-none focus:ring focus:border-primary-500 dark:focus:border-primary-500 placeholder-neutral-500 dark:placeholder-neutral-300 text-neutral-700 dark:text-neutral-300"
+                        className={`block w-full px-4 py-2 rounded border ${errors.email ? 'border-red-500' : 'border-neutral-400'} dark:border-neutral-600 bg-transparent focus:outline-none focus:ring focus:border-primary-500 dark:focus:border-primary-500 placeholder-neutral-500 dark:placeholder-neutral-300 text-neutral-700 dark:text-neutral-300`}
                         placeholder="Email"
                       />
+                      {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
                     </div>
 
                     <div className="mb-4">
@@ -119,10 +129,10 @@ const Register = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         name="password"
                         autoComplete="off"
-                        required
-                        className="block w-full px-4 py-2 rounded border border-neutral-400 dark:border-neutral-600 bg-transparent focus:outline-none focus:ring focus:border-primary-500 dark:focus:border-primary-500 placeholder-neutral-500 dark:placeholder-neutral-300 text-neutral-700 dark:text-neutral-300"
+                        className={`block w-full px-4 py-2 rounded border ${errors.password ? 'border-red-500' : 'border-neutral-400'} dark:border-neutral-600 bg-transparent focus:outline-none focus:ring focus:border-primary-500 dark:focus:border-primary-500 placeholder-neutral-500 dark:placeholder-neutral-300 text-neutral-700 dark:text-neutral-300`}
                         placeholder="Password"
                       />
+                      {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
                     </div>
 
                     <div className="mb-4">
@@ -132,10 +142,10 @@ const Register = () => {
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         name="confirmPassword"
                         autoComplete="off"
-                        required
-                        className="block w-full px-4 py-2 rounded border border-neutral-400 dark:border-neutral-600 bg-transparent focus:outline-none focus:ring focus:border-primary-500 dark:focus:border-primary-500 placeholder-neutral-500 dark:placeholder-neutral-300 text-neutral-700 dark:text-neutral-300"
+                        className={`block w-full px-4 py-2 rounded border ${errors.confirmPassword ? 'border-red-500' : 'border-neutral-400'} dark:border-neutral-600 bg-transparent focus:outline-none focus:ring focus:border-primary-500 dark:focus:border-primary-500 placeholder-neutral-500 dark:placeholder-neutral-300 text-neutral-700 dark:text-neutral-300`}
                         placeholder="Confirm Password"
                       />
+                      {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword}</p>}
                     </div>
 
                     <div className="mb-6 text-center">

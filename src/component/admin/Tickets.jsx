@@ -1,13 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth } from "../../context/AuthProvider";
-import _ from 'lodash'; 
 
-function AllTokens() {
+import TicketCreatingModal from '../user/TicketCreatingModal';
+import TicketDetailModal from '../user/TicketsDetailModal';
+import _ from 'lodash';
+
+function Ticket() {
     const apiUrl = import.meta.env.VITE_API_URL;
     const [tickets, setTickets] = useState([]);
     const [status, setStatus] = useState('');
     const [priority, setPriority] = useState('');
+    const [ticketId, setTicketId] = useState(null);
+    const [isTicketCreatingModalOpen, setIsTicketCreatingModalOpen] = useState(false);
+    const [isTicketDetailModalOpen, setIsTicketDetailModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const { authTokens } = useAuth();
@@ -42,6 +48,29 @@ function AllTokens() {
         fetchTickets();
     }, [fetchTickets]);
 
+    const toggleTicketCreatingModal = () => {
+        setIsTicketCreatingModalOpen(!isTicketCreatingModalOpen);
+    };
+
+    const toggleTicketDetailModal = (ticketId) => {
+        setTicketId(ticketId);
+        setIsTicketDetailModalOpen(!isTicketDetailModalOpen);
+    };
+
+    const handleNewTicket = (newTicket) => {
+        setTickets((prevTickets) => [newTicket, ...prevTickets]);
+    };
+
+    const handleTicketUpdate = (updatedTicket) => {
+        setTickets((prevTickets) => prevTickets.map(ticket =>
+            ticket.id === updatedTicket.id ? updatedTicket : ticket
+        ));
+    };
+
+    const handleTicketDelete = (deletedTicketId) => {
+        setTickets((prevTickets) => prevTickets.filter(ticket => ticket.id !== deletedTicketId));
+    };
+
     return (
         <div className="p-4 sm:ml-64">
             <div className="md:p-10 rounded-lg mt-14">
@@ -71,6 +100,15 @@ function AllTokens() {
                                 <option value="high">High</option>
                             </select>
                         </div>
+
+                        <div>
+                            <button
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                onClick={toggleTicketCreatingModal}
+                            >
+                                Create Ticket
+                            </button>
+                        </div>
                     </div>
 
                     {loading && <p>Loading...</p>}
@@ -86,19 +124,25 @@ function AllTokens() {
                                         <TicketDescription description={ticket.description} />
                                     </div>
                                 </div>
-                                <div className="px-6 pt-4 pb-2 flex justify-between">
+                                <div className="px-2 pt-4 pb-2 flex justify-between">
                                     <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
                                         Priority: {ticket.priority}
                                     </span>
                                     <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
                                         Status: {ticket.status}
                                     </span>
+                                    <button onClick={() => toggleTicketDetailModal(ticket.id)} className="inline-block bg-red-900 rounded-full px-3 py-1 text-sm font-semibold text-white mr-2 mb-2">
+                                        Details
+                                    </button>
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
             </div>
+
+            {isTicketCreatingModalOpen && <TicketCreatingModal onClose={toggleTicketCreatingModal} onTicketCreate={handleNewTicket} />}
+            {isTicketDetailModalOpen && <TicketDetailModal ticketId={ticketId} onClose={toggleTicketDetailModal} onTicketUpdate={handleTicketUpdate} onTicketDelete={handleTicketDelete} />}
         </div>
     );
 }
@@ -124,4 +168,4 @@ const TicketDescription = ({ description }) => {
     );
 };
 
-export default AllTokens;
+export default Ticket;

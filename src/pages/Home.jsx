@@ -1,11 +1,11 @@
 import React from 'react'
 import Navbar from '../component/user/Navbar'
-import AllTokens from '../component/user/AllTokens'
+import AllTickets from '../component/user/AllTickets'
 function Home() {
   return (
     <div>
       <Navbar/>
-      <AllTokens/>
+      <AllTickets/>
       </div>
   )
 }
