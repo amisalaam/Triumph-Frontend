@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useAuth } from "../../context/AuthProvider";
 import _ from 'lodash';
 import TicketCreatingModal from './TicketCreatingModal';
-import TicketDetailModal from './TicketDetailModal';
+import TicketDetailModal from './TicketsDetailModal';
 
 function MyTickets() {
     const { authTokens } = useAuth();

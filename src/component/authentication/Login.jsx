@@ -9,24 +9,30 @@ import Logo from '../../assets/triumph-log.png';
 import { useAuth } from "../../context/AuthProvider";
 
 const Login = () => {
-
   const apiUrl = import.meta.env.VITE_API_URL;
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const { login } = useAuth();
 
   const validateForm = () => {
     if (!email || !password) {
-      setError("Please fill in all fields.");
+      Swal.fire({
+        icon: 'warning',
+        title: 'Validation Error',
+        text: 'Please fill in all fields.',
+      });
       return false;
     }
     return true;
   };
-  
+
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
     try {
       const response = await axios.post(`${apiUrl}/api/login/`, {
         email,
@@ -75,8 +81,6 @@ const Login = () => {
       }
     }
   };
-  
-
 
   return (
     <div className="gradient-form bg-neutral-300 dark:bg-neutral-700">
@@ -166,6 +170,6 @@ const Login = () => {
       </div>
     </div>
   );
-}; 
+};
 
 export default Login;
