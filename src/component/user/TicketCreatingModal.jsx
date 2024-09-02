@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from "../../context/AuthProvider";
+import Swal from 'sweetalert2';
 import axios from 'axios';
+
 
 function TicketCreatingModal({ onClose, onTicketCreate }) {
   const [title, setTitle] = useState('');
@@ -23,11 +25,25 @@ function TicketCreatingModal({ onClose, onTicketCreate }) {
           Authorization: `Bearer ${authTokens.accessToken}`,
         },
       });
-      console.log(response.data);
+
       onTicketCreate(response.data);
       onClose();
+
+      Swal.fire({
+        title: 'Success!',
+        text: 'Ticket created successfully.',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      });
     } catch (error) {
       console.error('Error creating ticket:', error);
+
+      Swal.fire({
+        title: 'Error!',
+        text: 'There was an issue creating the ticket.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
     }
   };
 

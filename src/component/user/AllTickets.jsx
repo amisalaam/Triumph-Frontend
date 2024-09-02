@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth } from "../../context/AuthProvider";
-import _ from 'lodash'; 
+import Swal from 'sweetalert2';
+import _ from 'lodash';
+
 
 function AllTickets() {
     const apiUrl = import.meta.env.VITE_API_URL;
@@ -28,14 +30,28 @@ function AllTickets() {
                     },
                 });
                 setTickets(response.data);
+    
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Tickets fetched successfully.',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
             } catch (error) {
                 setError('Error fetching tickets.');
-                console.error('Error fetching tickets:', error);
+    
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'There was an issue fetching tickets.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
             } finally {
                 setLoading(false);
             }
         }, 500), [status, priority, apiUrl, authTokens.accessToken]
     );
+    
 
     // Fetch tickets when filters change
     useEffect(() => {
@@ -75,6 +91,10 @@ function AllTickets() {
 
                     {loading && <p>Loading...</p>}
                     {error && <p className="text-red-500">{error}</p>}
+
+                    {!loading && !error && tickets.length === 0 && (
+                        <p className="text-center text-gray-500">No tickets found.</p>
+                    )}
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                         {tickets.map(ticket => (

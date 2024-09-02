@@ -81,7 +81,7 @@ const Register = () => {
 
   return (
     <div className="gradient-form bg-neutral-300 dark:bg-neutral-700">
-      <div className="min-h-screen flex justify-center items-center px-20 mx-auto max-w-screen-2xl">
+      <div className="min-h-screen flex justify-center items-center md:px-20 px-5 mx-auto max-w-screen-2xl">
         <div className="g-6 flex text-neutral-800 dark:text-neutral-200 w-full">
           <div className="block rounded-lg bg-white shadow-lg dark:bg-neutral-800 w-full">
             <div className="g-0 lg:flex lg:flex-wrap">
