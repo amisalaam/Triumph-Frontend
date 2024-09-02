@@ -31,12 +31,6 @@ function AllTickets() {
                 });
                 setTickets(response.data);
     
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'Tickets fetched successfully.',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                });
             } catch (error) {
                 setError('Error fetching tickets.');
     
